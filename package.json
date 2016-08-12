@@ -1,0 +1,54 @@
+{
+  "name": "TodoApp",
+  "version": "1.0.0",
+  "description": "Simple Todo App",
+  "main": "js/app.jsx",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "apxor": "browserify -t [babelify] js/app.jsx > js/app.js",
+    "lib": "browserify -r classnames -r immutable -r keymirror -r object-assign -r react -r react/addons -r react-router -r superagent -t [envify --NODE_ENV production] | uglifyjs -cm > js/lib.js",
+    "start": "browserify -t [babelify] js/app.jsx > js/app.js",
+    "build": "browserify . -x classnames -x immutable -x keymirror -x object-assign -x react -x react/addons -x react-router -x flux -x superagent -t [envify --NODE_ENV production] -t [babelify --stage 0] | uglifyjs -cm > js/bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Araja Jyothi Babu",
+  "license": "APXOR",
+  "peerDependencies": {
+    "react": "^0.14.3 || ^15.0.0"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "classnames": "^2.1.3",
+    "history": "1.13.1",
+    "immutable": "^3.7.4",
+    "jquery": "^2.2.3",
+    "keymirror": "~0.1.0",
+    "moment": "^2.13.0",
+    "object-assign": "^1.0.0",
+    "react": "^15.0.0",
+    "react-bootstrap-daterangepicker": "^3.0.0",
+    "react-addons-css-transition-group": "^15.0.0",
+    "react-addons-test-utils": "^15.0.0",
+    "react-dom": "^15.0.0",
+    "react-router": "^2.4.1",
+    "superagent": "^1.3.0"
+  },
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "babelify": "^6.3.0",
+    "browserify": "^11.1.0",
+    "envify": "^3.4.0",
+    "uglify-js": "^2.4.24",
+    "watchify": "^3.4.0"
+  },
+  "keywords": [
+    "react",
+    "react-component",
+    "routing",
+    "route",
+    "routes",
+    "router"
+  ]
+}
