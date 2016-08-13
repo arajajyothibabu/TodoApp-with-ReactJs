@@ -125,15 +125,40 @@ var ListComponent = React.createClass({
             todoList: nextProps.list
         });
     },
+    handleComplete: function handleComplete(e) {
+        e.preventDefault();
+        this.props.handleComplete(e.target.id);
+    },
+    removeTask: function removeTask(e) {
+        e.preventDefault();
+        this.props.handleRemove(e.target.id);
+    },
     render: function render() {
+        var _this = this;
         return React.createElement(
             'div',
             { className: 'list-group' },
             this.state.todoList.map(function (task) {
+                var classes = task.status ? classes = 'list-group-item clearfix list-group-item-success' : 'list-group-item clearfix';
                 return React.createElement(
-                    'button',
-                    { key: task.id, id: task.id, type: 'button', className: "list-group-item " + (task.status || "active") },
-                    task.desc
+                    'li',
+                    { className: classes, id: task.id },
+                    task.desc,
+                    React.createElement(
+                        'div',
+                        { className: 'pull-right', role: 'group' },
+                        Boolean(task.status) || React.createElement(
+                            'button',
+                            { type: 'button', id: task.id, className: 'btn btn-xs btn-success img-circle', onClick: _this.handleComplete },
+                            '✓'
+                        ),
+                        ' ',
+                        React.createElement(
+                            'button',
+                            { type: 'button', id: task.id, className: 'btn btn-xs btn-danger img-circle', onClick: _this.removeTask },
+                            'Ｘ'
+                        )
+                    )
                 );
             })
         );
@@ -148,11 +173,12 @@ var TodoAppComponent = React.createClass({
     },
     getInitialState: function getInitialState() {
         return {
-            todoList: [{ id: this.generateId(), desc: "I am so and so", status: false }, { id: this.generateId(), desc: "I am so and sooo", status: true }, { id: this.generateId(), desc: "I am so can't sooo", status: false }, { id: this.generateId(), desc: "I am so can sooo", status: true }, { id: this.generateId(), desc: "I am so only sooo", status: false }, { id: this.generateId(), desc: "I am so but sooo", status: true }],
+            todoList: [],
             filteredList: [],
             currentFilter: 0
         };
     },
+
     componentWillMount: function componentWillMount() {
         this.setState({
             filteredList: this.state.todoList
@@ -172,6 +198,28 @@ var TodoAppComponent = React.createClass({
             })
         });
     },
+    handleRemove: function handleRemove(taskId) {
+        this.setState({
+            todoList: this.state.todoList.filter(function (task, i) {
+                return taskId != task.id;
+            })
+        }, function () {
+            this.addTodoFilter(this.state.currentFilter);
+        });
+    },
+    handleComplete: function handleComplete(taskId) {
+        this.setState({
+            todoList: this.state.todoList.map(function (task, i) {
+                if (taskId == task.id) {
+                    return { id: task.id, desc: task.desc, status: true };
+                } else {
+                    return task;
+                }
+            })
+        }, function () {
+            this.addTodoFilter(this.state.currentFilter);
+        });
+    },
     render: function render() {
         return React.createElement(
             'div',
@@ -180,7 +228,7 @@ var TodoAppComponent = React.createClass({
             React.createElement('hr', null),
             React.createElement(FilterComponent, { addTodoFilter: this.addTodoFilter }),
             React.createElement('hr', null),
-            React.createElement(ListComponent, { list: this.state.filteredList })
+            React.createElement(ListComponent, { list: this.state.filteredList, handleRemove: this.handleRemove, handleComplete: this.handleComplete })
         );
     }
 });
