@@ -13,31 +13,15 @@ var FilterComponent = React.createClass({
 
     getInitialState: function getInitialState() {
         return {
-            allState: "active",
-            cState: "",
-            unCState: ""
+            activeArray: [true, false, false]
         };
     },
-    handleAll: function handleAll(e) {
-        this.setState({
-            allState: "active",
-            cState: "",
-            unCState: ""
+    handleFilter: function handleFilter(e) {
+        this.setState({ activeArray: this.state.activeArray.map(function (arrayElement, i) {
+                return e.target.id == i;
+            })
         });
-    },
-    handleCompleted: function handleCompleted(e) {
-        this.setState({
-            allState: "",
-            cState: "active",
-            unCState: ""
-        });
-    },
-    handleUnCompleted: function handleUnCompleted(e) {
-        this.setState({
-            allState: "",
-            cState: "",
-            unCState: "active"
-        });
+        this.props.addTodoFilter(e.target.id);
     },
     render: function render() {
         return React.createElement(
@@ -45,28 +29,28 @@ var FilterComponent = React.createClass({
             { className: 'nav nav-pills' },
             React.createElement(
                 'li',
-                { role: 'presentation', className: this.state.allState, onClick: this.handleAll },
+                { role: 'presentation', className: Boolean(this.state.activeArray[0]) ? "active" : "" },
                 React.createElement(
                     'a',
-                    { href: '#', id: 'display' },
+                    { href: '#', id: '0', onClick: this.handleFilter },
                     'All Tasks'
                 )
             ),
             React.createElement(
                 'li',
-                { role: 'presentation', className: this.state.cState, onClick: this.handleCompleted },
+                { role: 'presentation', className: Boolean(this.state.activeArray[1]) ? "active" : "" },
                 React.createElement(
                     'a',
-                    { href: '#', id: 'complete' },
+                    { href: '#', id: '1', onClick: this.handleFilter },
                     'Completed Tasks'
                 )
             ),
             React.createElement(
                 'li',
-                { role: 'presentation', className: this.state.unCState, onClick: this.handleUnCompleted },
+                { role: 'presentation', className: Boolean(this.state.activeArray[2]) ? "active" : "" },
                 React.createElement(
                     'a',
-                    { href: '#', id: 'incomplete' },
+                    { href: '#', id: '2', onClick: this.handleFilter },
                     'InCompleted Tasks'
                 )
             )
@@ -163,8 +147,14 @@ var TodoAppComponent = React.createClass({
     },
     getInitialState: function getInitialState() {
         return {
-            todoList: [{ id: this.generateId(), desc: "I am so and so", status: false }, { id: this.generateId(), desc: "I am so and sooo", status: true }]
+            todoList: [{ id: this.generateId(), desc: "I am so and so", status: false }, { id: this.generateId(), desc: "I am so and sooo", status: true }, { id: this.generateId(), desc: "I am so can't sooo", status: false }, { id: this.generateId(), desc: "I am so can sooo", status: true }, { id: this.generateId(), desc: "I am so only sooo", status: false }, { id: this.generateId(), desc: "I am so but sooo", status: true }],
+            filteredList: []
         };
+    },
+    componentWillMount: function componentWillMount() {
+        this.setState({
+            filteredList: this.state.todoList
+        });
     },
     addTodoTask: function addTodoTask(task) {
         var newTask = { id: this.generateId(), desc: task, status: false };
@@ -172,7 +162,11 @@ var TodoAppComponent = React.createClass({
         this.setState({ todoList: newList });
     },
     addTodoFilter: function addTodoFilter(filter) {
-        var sel = { desc: filter, status: false };
+        this.setState({
+            filteredList: this.state.todoList.filter(function (task, i) {
+                return filter == 0 || filter == 1 && task.status || filter == 2 && !task.status;
+            })
+        });
     },
     render: function render() {
         return React.createElement(
@@ -180,9 +174,9 @@ var TodoAppComponent = React.createClass({
             { className: 'container-fluid' },
             React.createElement(AddComponent, { addTodoTask: this.addTodoTask }),
             React.createElement('hr', null),
-            React.createElement(FilterComponent, { addTodofilter: this.addTodoFilter }),
+            React.createElement(FilterComponent, { addTodoFilter: this.addTodoFilter }),
             React.createElement('hr', null),
-            React.createElement(ListComponent, { list: this.state.todoList })
+            React.createElement(ListComponent, { list: this.state.filteredList })
         );
     }
 });

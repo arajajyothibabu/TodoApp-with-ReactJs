@@ -7,42 +7,26 @@ global.jQuery = $;
 var FilterComponent =React.createClass({
     getInitialState : function() {
         return {
-            allState : "active",
-            cState : "",
-            unCState : ""
+            activeArray : [true, false, false]
         };
     },
-    handleAll : function(e){
-        this.setState({
-            allState : "active",
-            cState : "",
-            unCState : ""
-        })
-    },
-    handleCompleted : function(e){
-        this.setState({
-            allState : "",
-            cState : "active",
-            unCState : ""
-        })
-    },
-    handleUnCompleted : function(e){
-        this.setState({
-            allState : "",
-            cState : "",
-            unCState : "active"
-        })
+    handleFilter : function(e){
+        this.setState({activeArray : this.state.activeArray.map(function(arrayElement, i){
+                return e.target.id == i;
+            })
+        });
+        this.props.addTodoFilter(e.target.id);
     },
     render : function(){
         return(
             <ul className="nav nav-pills">
-                <li role="presentation" className={ this.state.allState}  onClick={this.handleAll} ><a href="#" id="display" >
+                <li role="presentation" className={ Boolean(this.state.activeArray[0]) ? "active" : "" } ><a href="#" id="0" onClick={this.handleFilter} >
                     All Tasks
                 </a></li>
-                <li role="presentation" className={ this.state.cState} onClick={this.handleCompleted } ><a href="#" id="complete">
+                <li role="presentation" className={ Boolean(this.state.activeArray[1])? "active" : "" } ><a href="#" id="1" onClick={this.handleFilter }>
                     Completed Tasks
                 </a></li>
-                <li role="presentation" className={ this.state.unCState} onClick={this.handleUnCompleted} ><a href="#" id="incomplete">
+                <li role="presentation" className={ Boolean(this.state.activeArray[2]) ? "active" : ""} ><a href="#" id="2" onClick={this.handleFilter}>
                     InCompleted Tasks
                 </a></li>
             </ul>
@@ -121,9 +105,19 @@ var TodoAppComponent = React.createClass({
         return {
             todoList : [
                 {id : this.generateId(), desc: "I am so and so", status : false},
-                {id : this.generateId(), desc: "I am so and sooo", status : true}
-            ]
+                {id : this.generateId(), desc: "I am so and sooo", status : true},
+                {id : this.generateId(), desc: "I am so can't sooo", status : false},
+                {id : this.generateId(), desc: "I am so can sooo", status : true},
+                {id : this.generateId(), desc: "I am so only sooo", status : false},
+                {id : this.generateId(), desc: "I am so but sooo", status : true}
+            ],
+            filteredList : []
         };
+    },
+    componentWillMount : function () {
+        this.setState({
+            filteredList : this.state.todoList
+        });
     },
     addTodoTask : function (task) {
         var newTask = { id : this.generateId(), desc: task, status : false};
@@ -131,20 +125,23 @@ var TodoAppComponent = React.createClass({
         this.setState({ todoList : newList});
     },
     addTodoFilter : function(filter) {
-        var sel = {desc: filter, status: false};
+        this.setState({
+            filteredList : this.state.todoList.filter(function (task, i) {
+                return filter == 0 || (filter == 1 && task.status) || (filter == 2 && !task.status);
+            })
+        });
     },
     render : function () {
         return (
             <div className="container-fluid">
                 <AddComponent addTodoTask={this.addTodoTask} />
                 <hr />
-                <FilterComponent addTodofilter={this.addTodoFilter}/>
+                <FilterComponent addTodoFilter={this.addTodoFilter}/>
                 <hr />
-                <ListComponent list={ this.state.todoList } />
+                <ListComponent list={ this.state.filteredList } />
             </div>
         );
     }
 });
 
 ReactDOM.render( <TodoAppComponent />, document.getElementById('block'));
-
