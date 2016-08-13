@@ -70,6 +70,7 @@ var AddComponent = React.createClass({
         this.setState({ desc: "" });
     },
     handleTask: function handleTask(e) {
+        if (e.target.value == "") return;
         this.setState({ desc: e.target.value });
     },
     render: function render() {
@@ -148,7 +149,8 @@ var TodoAppComponent = React.createClass({
     getInitialState: function getInitialState() {
         return {
             todoList: [{ id: this.generateId(), desc: "I am so and so", status: false }, { id: this.generateId(), desc: "I am so and sooo", status: true }, { id: this.generateId(), desc: "I am so can't sooo", status: false }, { id: this.generateId(), desc: "I am so can sooo", status: true }, { id: this.generateId(), desc: "I am so only sooo", status: false }, { id: this.generateId(), desc: "I am so but sooo", status: true }],
-            filteredList: []
+            filteredList: [],
+            currentFilter: 0
         };
     },
     componentWillMount: function componentWillMount() {
@@ -158,11 +160,13 @@ var TodoAppComponent = React.createClass({
     },
     addTodoTask: function addTodoTask(task) {
         var newTask = { id: this.generateId(), desc: task, status: false };
-        var newList = this.state.todoList.concat([newTask]);
-        this.setState({ todoList: newList });
+        this.setState({ todoList: this.state.todoList.concat([newTask]) }, function () {
+            this.addTodoFilter(this.state.currentFilter);
+        });
     },
     addTodoFilter: function addTodoFilter(filter) {
         this.setState({
+            currentFilter: filter,
             filteredList: this.state.todoList.filter(function (task, i) {
                 return filter == 0 || filter == 1 && task.status || filter == 2 && !task.status;
             })

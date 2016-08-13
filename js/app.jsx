@@ -44,6 +44,7 @@ var AddComponent = React.createClass({
         this.setState({ desc : ""});
     },
     handleTask : function (e) {
+        if(e.target.value == "") return;
         this.setState({ desc : e.target.value});
     },
    render:function(){
@@ -111,7 +112,8 @@ var TodoAppComponent = React.createClass({
                 {id : this.generateId(), desc: "I am so only sooo", status : false},
                 {id : this.generateId(), desc: "I am so but sooo", status : true}
             ],
-            filteredList : []
+            filteredList : [],
+            currentFilter : 0
         };
     },
     componentWillMount : function () {
@@ -121,11 +123,13 @@ var TodoAppComponent = React.createClass({
     },
     addTodoTask : function (task) {
         var newTask = { id : this.generateId(), desc: task, status : false};
-        var newList = this.state.todoList.concat([newTask]);
-        this.setState({ todoList : newList});
+        this.setState({ todoList : this.state.todoList.concat([newTask])}, function(){
+            this.addTodoFilter(this.state.currentFilter);
+        });
     },
     addTodoFilter : function(filter) {
         this.setState({
+            currentFilter : filter,
             filteredList : this.state.todoList.filter(function (task, i) {
                 return filter == 0 || (filter == 1 && task.status) || (filter == 2 && !task.status);
             })
