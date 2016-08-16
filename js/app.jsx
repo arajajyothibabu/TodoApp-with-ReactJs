@@ -86,6 +86,10 @@ var ListComponent = React.createClass({
         e.preventDefault();
         this.props.handleNew(e.target.id);
     },
+    handleRemove : function(e){
+        e.preventDefault();
+        this.props.handleRemove(e.target.id);
+    },
     handleComplete : function(e){
         e.preventDefault();
         this.props.handleComplete(e.target.id);
@@ -109,19 +113,19 @@ var ListComponent = React.createClass({
                                 }
                                 <div className="pull-right" role="group">
                                     {
-                                        task.status == 0 || <button type="button" id={task.id} className="btn btn-xs btn-success img-circle" onClick={_this.handleNew}>New</button>
+                                        task.status == 0 || <button type="button" id={task.id} className="btn btn-xs btn-success" onClick={_this.handleNew}>New</button>
                                     }
-                                </div>
-                                <div className="pull-right" role="group">
+                                    &nbsp;
                                     {
-                                        task.status == 1 || <button type="button" id={task.id} className="btn btn-xs btn-danger img-circle" onClick={_this.handleOnGoing}>OnGoing</button>
-
+                                        task.status == 1 || <button type="button" id={task.id} className="btn btn-xs btn-danger " onClick={_this.handleOnGoing}>OnGoing</button>
                                     }
-                                </div>
-                                <div className="pull-right" role="group">
+                                    &nbsp;
                                     {
-                                        task.status == 2 || <button type="button" id={task.id} className="btn btn-xs btn-warning img-circle" onClick={_this.handleComplete}>Completed</button>
-
+                                        task.status == 2 || <button type="button" id={task.id} className="btn btn-xs btn-warning " onClick={_this.handleComplete}>Completed</button>
+                                    }
+                                    &nbsp;
+                                    {
+                                        task.status == 2 || <button type="button" id={task.id} className="btn btn-xs btn-primary" onClick={_this.handleRemove}>Suspend</button>
                                     }
                                 </div>
 
@@ -169,14 +173,23 @@ var TodoAppComponent = React.createClass({
             })
         });
     },
-    handleNew: function (taskId) {
-       /* this.setState({
+    handleRemove : function(taskId){
+        this.setState({
             todoList : this.state.todoList.filter(function (task, i) {
                 return taskId != task.id;
             })
         }, function(){
             this.addTodoFilter(this.state.currentFilter);
-        });*/
+        });
+    },
+    handleNew: function (taskId) {
+        /* this.setState({
+         todoList : this.state.todoList.filter(function (task, i) {
+         return taskId != task.id;
+         })
+         }, function(){
+         this.addTodoFilter(this.state.currentFilter);
+         });*/
         this.setState({
             todoList : this.state.todoList.map(function (task, i) {
                 if(taskId == task.id){
@@ -222,7 +235,7 @@ var TodoAppComponent = React.createClass({
                 <hr />
                 <FilterComponent addTodoFilter={this.addTodoFilter} />
                 <hr />
-                <ListComponent list={ this.state.filteredList } handleComplete={this.handleComplete} handleNew={this.handleNew} handleOnGoing={this.handleOnGoing}/>
+                <ListComponent list={ this.state.filteredList } handleComplete={this.handleComplete} handleNew={this.handleNew} handleOnGoing={this.handleOnGoing} handleRemove={this.handleRemove}/>
             </div>
         );
     }
