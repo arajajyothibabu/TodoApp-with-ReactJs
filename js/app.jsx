@@ -12,8 +12,8 @@ var FilterComponent =React.createClass({
     },
     handleFilter : function(e){
         this.setState({activeArray : this.state.activeArray.map(function(arrayElement, i){
-                return e.target.id == i;
-            })
+            return e.target.id == i;
+        })
         });
         this.props.addTodoFilter(e.target.id);
     },
@@ -21,13 +21,13 @@ var FilterComponent =React.createClass({
         return(
             <ul className="nav nav-pills">
                 <li role="presentation" className={ Boolean(this.state.activeArray[0]) ? "active" : "" } ><a href="#" id="0" onClick={this.handleFilter} >
-                    All Tasks
+                    New Tasks
                 </a></li>
                 <li role="presentation" className={ Boolean(this.state.activeArray[1])? "active" : "" } ><a href="#" id="1" onClick={this.handleFilter }>
-                    Completed Tasks
+                    OnGoing Tasks
                 </a></li>
                 <li role="presentation" className={ Boolean(this.state.activeArray[2]) ? "active" : ""} ><a href="#" id="2" onClick={this.handleFilter}>
-                    InCompleted Tasks
+                    Completed Tasks
                 </a></li>
             </ul>
         );
@@ -44,26 +44,27 @@ var AddComponent = React.createClass({
         this.setState({ desc : ""});
     },
     handleTask : function (e) {
-        if(e.target.value == "") return;
         this.setState({ desc : e.target.value});
+        if(e.target.value == "") return;
+
     },
-   render:function(){
-       return(
-           <div className="container-fluid">
-               <button className="btn btn-success" data-toggle="collapse" data-target="#new-task">New Task</button>
-               <div id="new-task" className="collapse">
-                   <div className="panel-body">
-                       <div className="input-group">
-                           <input type="text" onChange={ this.handleTask } value={this.state.desc} className="form-control" placeholder="Enter the task..." />
+    render:function(){
+        return(
+            <div className="container-fluid">
+                <button className="btn btn-success" data-toggle="collapse" data-target="#new-task">New Task</button>
+                <div id="new-task" className="collapse">
+                    <div className="panel-body">
+                        <div className="input-group">
+                            <input type="text" onChange={ this.handleTask } value={this.state.desc} className="form-control" placeholder="Enter the task..." />
                            <span className="input-group-btn">
                                <button className="btn btn-default" onClick={ this.handleSubmit} type="button">Add!</button>
                            </span>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       );
-   }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 });
 var ListComponent = React.createClass({
     getInitialState : function () {
@@ -81,13 +82,18 @@ var ListComponent = React.createClass({
             todoList : nextProps.list
         });
     },
+    handleNew : function(e){
+        e.preventDefault();
+        this.props.handleNew(e.target.id);
+    },
     handleComplete : function(e){
         e.preventDefault();
         this.props.handleComplete(e.target.id);
     },
-    removeTask : function(e){
+    handleOnGoing : function(e)
+    {
         e.preventDefault();
-        this.props.handleRemove(e.target.id);
+        this.props.handleOnGoing(e.target.id);
     },
     render : function() {
         var _this = this;
@@ -95,7 +101,7 @@ var ListComponent = React.createClass({
             <div className="list-group">
                 {
                     this.state.todoList.map(function (task) {
-                        var classes = task.status? classes = 'list-group-item clearfix list-group-item-success' : 'list-group-item clearfix';
+                        var classes = task.status == 0? classes = 'list-group-item clearfix list-group-item-success' : 'list-group-item clearfix';
                         return (
                             <li className={classes} id={task.id}>
                                 {
@@ -103,10 +109,22 @@ var ListComponent = React.createClass({
                                 }
                                 <div className="pull-right" role="group">
                                     {
-                                        Boolean(task.status) || <button type="button" id={task.id} className="btn btn-xs btn-success img-circle" onClick={_this.handleComplete}>&#x2713;</button>
+                                        task.status == 0 || <button type="button" id={task.id} className="btn btn-xs btn-success img-circle" onClick={_this.handleNew}>New</button>
                                     }
-                                     &nbsp;<button type="button" id={task.id} className="btn btn-xs btn-danger img-circle" onClick={_this.removeTask}>&#xff38;</button>
                                 </div>
+                                <div className="pull-right" role="group">
+                                    {
+                                        task.status == 1 || <button type="button" id={task.id} className="btn btn-xs btn-danger img-circle" onClick={_this.handleOnGoing}>OnGoing</button>
+
+                                    }
+                                </div>
+                                <div className="pull-right" role="group">
+                                    {
+                                        task.status == 2 || <button type="button" id={task.id} className="btn btn-xs btn-warning img-circle" onClick={_this.handleComplete}>Completed</button>
+
+                                    }
+                                </div>
+
                             </li>
                         );
                     })
@@ -122,19 +140,23 @@ var TodoAppComponent = React.createClass({
     },
     getInitialState: function () {
         return {
-            todoList : [],
+            todoList : [
+                {id : this.generateId(), desc: 'eat food', status:0},
+                {id : this.generateId(), desc: 'eat food regularly', status :1},
+                {id : this.generateId(), desc: 'Drink milk daily', status :2}] ,
             filteredList : [],
-            currentFilter : 0
+            currentFilter : 0,
+
         };
     },
-   
+
     componentWillMount : function () {
         this.setState({
             filteredList : this.state.todoList
         });
     },
     addTodoTask : function (task) {
-        var newTask = { id : this.generateId(), desc: task, status : false};
+        var newTask = { id : this.generateId(), desc: task, status :0 };
         this.setState({ todoList : this.state.todoList.concat([newTask])}, function(){
             this.addTodoFilter(this.state.currentFilter);
         });
@@ -143,14 +165,25 @@ var TodoAppComponent = React.createClass({
         this.setState({
             currentFilter : filter,
             filteredList : this.state.todoList.filter(function (task, i) {
-                return filter == 0 || (filter == 1 && task.status) || (filter == 2 && !task.status);
+                return (filter == 0 && (task.status==0)) || (filter == 1 && (task.status == 1)) || (filter == 2 && (task.status == 2));
             })
         });
     },
-    handleRemove: function (taskId) {
-        this.setState({
+    handleNew: function (taskId) {
+       /* this.setState({
             todoList : this.state.todoList.filter(function (task, i) {
                 return taskId != task.id;
+            })
+        }, function(){
+            this.addTodoFilter(this.state.currentFilter);
+        });*/
+        this.setState({
+            todoList : this.state.todoList.map(function (task, i) {
+                if(taskId == task.id){
+                    return {id : task.id, desc : task.desc, status :0  };
+                }else{
+                    return task;
+                }
             })
         }, function(){
             this.addTodoFilter(this.state.currentFilter);
@@ -160,7 +193,20 @@ var TodoAppComponent = React.createClass({
         this.setState({
             todoList : this.state.todoList.map(function (task, i) {
                 if(taskId == task.id){
-                    return {id : task.id, desc : task.desc, status : true };
+                    return {id : task.id, desc : task.desc, status : 2 };
+                }else{
+                    return task;
+                }
+            })
+        }, function(){
+            this.addTodoFilter(this.state.currentFilter);
+        });
+    },
+    handleOnGoing : function(taskId){
+        this.setState({
+            todoList : this.state.todoList.map(function (task, i) {
+                if(taskId == task.id){
+                    return {id : task.id, desc : task.desc, status : 1 };
                 }else{
                     return task;
                 }
@@ -176,7 +222,7 @@ var TodoAppComponent = React.createClass({
                 <hr />
                 <FilterComponent addTodoFilter={this.addTodoFilter} />
                 <hr />
-                <ListComponent list={ this.state.filteredList } handleRemove={this.handleRemove} handleComplete={this.handleComplete}/>
+                <ListComponent list={ this.state.filteredList } handleComplete={this.handleComplete} handleNew={this.handleNew} handleOnGoing={this.handleOnGoing}/>
             </div>
         );
     }
