@@ -39,7 +39,8 @@ var AddComponent = React.createClass({
             desc : ""
         };
     },
-    handleSubmit: function () {
+    handleSubmit: function (e) {
+        e.preventDefault();
         this.props.addTodoTask(this.state.desc);
         this.setState({ desc : ""});
     },
@@ -52,17 +53,19 @@ var AddComponent = React.createClass({
         return(
             <div className="container-fluid">
                 <button className="btn btn-success" data-toggle="collapse" data-target="#new-task">New Task</button>
-                <div id="new-task" className="collapse">
-                    <div className="panel-body">
-                        <div className="input-group">
-                            <input type="text" onChange={ this.handleTask } value={this.state.desc} className="form-control" placeholder="Enter the task..." />
-                           <span className="input-group-btn">
-                               <button className="btn btn-default" onClick={ this.handleSubmit} type="button">Add!</button>
-                           </span>
+                    <form onSubmit={this.handleSubmit}>
+                        <div id="new-task" className="collapse">
+                            <div className="panel-body">
+                                <div className="input-group">
+                                    <input type="text" onChange={ this.handleTask } value={this.state.desc} className="form-control" placeholder="Enter the task..." />
+                                        <span className="input-group-btn">
+                                            <button className="btn btn-default" type="submit">Add!</button>
+                                        </span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
         );
     }
 });
@@ -113,7 +116,7 @@ var ListComponent = React.createClass({
                                 }
                                 <div className="pull-right" role="group">
                                     {
-                                        task.status == 0 || <button type="button" id={task.id} className="btn btn-xs btn-success" onClick={_this.handleNew}>New</button>
+                                        (task.status == 0||task.status == 2) || <button type="button" id={task.id} className="btn btn-xs btn-success" onClick={_this.handleNew}>Suspend</button>
                                     }
                                     &nbsp;
                                     {
@@ -121,11 +124,11 @@ var ListComponent = React.createClass({
                                     }
                                     &nbsp;
                                     {
-                                        task.status == 2 || <button type="button" id={task.id} className="btn btn-xs btn-warning " onClick={_this.handleComplete}>Completed</button>
+                                        (task.status == 2||task.status == 0) || <button type="button" id={task.id} className="btn btn-xs btn-warning " onClick={_this.handleComplete}>Completed</button>
                                     }
                                     &nbsp;
                                     {
-                                        task.status == 2 || <button type="button" id={task.id} className="btn btn-xs btn-primary" onClick={_this.handleRemove}>Suspend</button>
+                                        <button type="button" id={task.id} className="btn btn-xs btn-primary" onClick={_this.handleRemove}>Delete</button>
                                     }
                                 </div>
 
