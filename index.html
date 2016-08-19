@@ -4,20 +4,35 @@
     <meta charset="UTF-8">
     <link href="css/todostyle.css" rel="stylesheet" type="text/css"/>
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <title>React-Sample</title>
 
 </head>
-<body>
+<div style="background-color: ">
+<div class="page-header" >
+
+    <h1 align="center">To-Do Application </h1>
+    <marquee><b><i>Know your ToDo List Activities and be punctual in your daily works</i></b></marquee>
+</div>
     <div class="container-fluid">
-        <div class="page-header" >
-            <h1 align="center">To-Do Application </h1>
-            <marquee><b><i>Know your ToDo List Activities and be punctual in your daily works</i></b></marquee>
-        </div>
         <div class="row">
             <div class="col-md-2"></div>
-            <div class="col-md-8" id="block">
+            <div class="col-md-8">
 
+                <ul class="nav nav-pills">
+                    <li role="presentation" class="active" id="create" onclick="create()"><a href="#">Create New</a></li>
+                    <li role="presentation"><a href="#" id="display">Display ToDo-List</a></li>
+                    <li role="presentation"><a href="#" id="complete">Completed Tasks</a></li>
+                    <li role="presentation"><a href="#" id="uncomplete">UnCompleted Tasks</a></li>
+                </ul>
+                <hr>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter the task...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Add!</button>
+                    </span>
+                </div>
             </div>
             <div class="col-md-2"></div>
         </div>
